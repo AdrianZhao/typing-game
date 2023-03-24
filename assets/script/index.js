@@ -7,105 +7,145 @@
 
 'use strict';
 
-var temp = document.querySelector('.time');
-var button = document.querySelector("button");
-var words = document.querySelector(".words");
-var timerDiv = document.querySelector(".time");
-var scoreDiv = document.querySelector(".score");
-var points = 0;
-var spans;
-var typed;
-var seconds = 60;
-var spark = new Audio("http://k003.kiwi6.com/hotlink/qdpr7bioht/spark.mp3");
+/* global canvas ctx animation:writable gameLoop label loop paintCircle isIntersectingRectangleWithCircle generateRandomNumber generateRandomCharCode paintParticles createParticles processParticles */
+let score = 0;
+let lives = 10;
+let caseSensitive = true;
 
-function countdown() {
-  points = 0;
-  var timer = setInterval(function(){
-    button.disabled = true;
-      seconds--;
-      temp.innerHTML = seconds;
-      if (seconds === 0) {
-        alert("Game over! Your score is " + points);
-        scoreDiv.innerHTML = "0";
-        words.innerHTML = "";
-        button.disabled = false;
-        clearInterval(timer);
-        seconds = 60;
-        timerDiv.innerHTML = "60";
-        button.disabled = false;	
-      }
-  }, 1000);
+const center = {
+  x: canvas.width / 2,
+  y: canvas.height / 2,
+  radius: 20,
+  color: '#FF0000'
+};
+
+const letter = {
+  font: '25px Monospace',
+  color: '#0095DD',
+  width: 15,
+  height: 20,
+  highestSpeed: 1.6,
+  lowestSpeed: 0.6,
+  probability: 0.02
+};
+
+let letters = [];
+
+ctx.font = label.font;
+letter.width = ctx.measureText('0').width;
+document.addEventListener('keydown', keyDownHandler);
+document.addEventListener('keyup', keyUpHandler);
+window.addEventListener('resize', resizeHandler);
+
+loop(function (frames) {
+  paintCircle(center.x, center.y, center.radius, center.color);
+  ctx.font = letter.font;
+  ctx.fillStyle = letter.color;
+  for (const l of letters) {
+    ctx.fillText(String.fromCharCode(l.code), l.x, l.y);
   }
-
-function random() {
-  words.innerHTML = "";
-  var random = Math.floor(Math.random() * (1943 - 0 + 1)) + 0;
-  var wordArray = list[random].split("");
-  for (var i = 0; i < wordArray.length; i++) {
-    var span = document.createElement("span");
-    span.classList.add("span");
-    span.innerHTML = wordArray[i];
-    words.appendChild(span);
-  }
-  spans = document.querySelectorAll(".span");
-}
-
-
-const list = ['dinosaur', 'love', 'pineapple', 'calendar', 'robot', 'building', 'population',
-'weather', 'bottle', 'history', 'dream', 'character', 'money', 'absolute',
-'discipline', 'machine', 'accurate', 'connection', 'rainbow', 'bicycle',
-'eclipse', 'calculator', 'trouble', 'watermelon', 'developer', 'philosophy',
-'database', 'periodic', 'capitalism', 'abominable', 'component', 'future',
-'pasta', 'microwave', 'jungle', 'wallet', 'canada', 'coffee', 'beauty', 'agency',
-'chocolate', 'eleven', 'technology', 'alphabet', 'knowledge', 'magician',
-'professor', 'triangle', 'earthquake', 'baseball', 'beyond', 'evolution',
-'banana', 'perfumer', 'computer', 'management', 'discovery', 'ambition', 'music',
-'eagle', 'crown', 'chess', 'laptop', 'bedroom', 'delivery', 'enemy', 'button',
-'superman', 'library', 'unboxing', 'bookstore', 'language', 'homework',
-'fantastic', 'economy', 'interview', 'awesome', 'challenge', 'science', 'mystery',
-'famous', 'league', 'memory', 'leather', 'planet', 'software', 'update', 'yellow',
-'keyboard', 'window'];
-
-button.addEventListener("click", function(e){
-  countdown();
-  random();
-  button.disabled = true;	
+  paintParticles();
+  ctx.font = label.font;
+  ctx.fillStyle = label.color;
+  ctx.fillText('Score: ' + score, label.left, label.margin);
+  ctx.fillText('Lives: ' + lives, label.right, label.margin);
+  processParticles(frames);
+  createLetters();
+  removeLetters(frames);
 });
 
-
-function typing(e) {
-  typed = String.fromCharCode(e.which);
-  for (var i = 0; i < spans.length; i++) {
-    if (spans[i].innerHTML === typed) { // if typed letter is the one from the word
-      if (spans[i].classList.contains("bg")) { // if it already has class with the bacground color then check the next one
-        continue;
-      } else if (spans[i].classList.contains("bg") === false && spans[i-1] === undefined || spans[i-1].classList.contains("bg") !== false ) { // if it dont have class, if it is not first letter or if the letter before it dont have class (this is done to avoid marking the letters who are not in order for being checked, for example if you have two "A"s so to avoid marking both of them if the first one is at the index 0 and second at index 5 for example)
-        spans[i].classList.add("bg");
-        break;
-      }
-    }
+function createLetters () {
+  if (Math.random() < letter.probability) {
+    const x = Math.random() < 0.5 ? 0 : canvas.width;
+    const y = Math.random() * canvas.height;
+    const dX = center.x - x;
+    const dY = center.y - y;
+    const norm = Math.sqrt(dX ** 2 + dY ** 2);
+    const speed = generateRandomNumber(letter.lowestSpeed, letter.highestSpeed);
+    letters.push({
+      x,
+      y,
+      code: generateRandomCharCode(caseSensitive),
+      speedX: dX / norm * speed,
+      speedY: dY / norm * speed
+    });
   }
-  var checker = 0;
-  for (var j = 0; j < spans.length; j++) { //checking if all the letters are typed
-    if (spans[j].className === "span bg") {
-      checker++;
-    }
-    if (checker === spans.length) { // if so, animate the words with animate.css class
-      spark.pause();
-      spark.currentTime = 0;
-      spark.play();
-      words.classList.add("animated");
-      words.classList.add("fadeOut");
-      points++; // increment the points
-      scoreDiv.innerHTML = points; //add points to the points div
-      document.removeEventListener("keydown", typing, false);
-      setTimeout(function(){
-        words.className = "words"; // restart the classes
-        random(); // give another word
-        document.addEventListener("keydown", typing, false);
-      }, 400);
+}
+
+function removeLetters (frames) {
+  for (const l of letters) {
+    if (isIntersectingRectangleWithCircle({ x: l.x, y: l.y - letter.height }, letter.width, letter.height, center, center.radius)) {
+      if (--lives === 0) {
+        window.alert('GAME OVER!');
+        window.location.reload(false);
+      } else if (lives > 0) {
+        window.alert('START AGAIN!');
+        letters = [];
+      }
+      break;
+    } else {
+      l.x += l.speedX * frames;
+      l.y += l.speedY * frames;
     }
   }
 }
 
-document.addEventListener("keydown", typing, false);
+function type (i, l) {
+  letters.splice(i, 1);
+  score++;
+  createParticles(l.x, l.y);
+}
+
+window.changeCase = function () {
+  caseSensitive = !caseSensitive;
+  if (caseSensitive) {
+    document.getElementById('change-case-text').innerHTML = '';
+  } else {
+    document.getElementById('change-case-text').innerHTML = 'in';
+  }
+};
+
+function keyDownHandler (e) {
+  if (animation !== undefined && e.keyCode >= 65 && e.keyCode <= 90) {
+    for (let i = letters.length - 1; i >= 0; i--) {
+      const l = letters[i];
+      if (caseSensitive) {
+        if (e.shiftKey) {
+          if (e.keyCode === l.code) {
+            type(i, l);
+            return;
+          }
+        } else {
+          if (e.keyCode + 32 === l.code) {
+            type(i, l);
+            return;
+          }
+        }
+      } else {
+        if (e.keyCode === l.code || e.keyCode + 32 === l.code) {
+          type(i, l);
+          return;
+        }
+      }
+    }
+    score--;
+  }
+}
+
+function keyUpHandler (e) {
+  if (e.keyCode === 27) {
+    if (animation === undefined) {
+      animation = window.requestAnimationFrame(gameLoop);
+    } else {
+      window.cancelAnimationFrame(animation);
+      animation = undefined;
+    }
+  }
+}
+
+function resizeHandler () {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  center.x = canvas.width / 2;
+  center.y = canvas.height / 2;
+}

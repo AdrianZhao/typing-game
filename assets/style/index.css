@@ -3,12 +3,256 @@
 html {
   font-family: Sofia Sans, sans-serif;
 }
-* {
-  margin: 0;
+:root {
+  --app-dark: #030022;
+  --app-light: #f0f2f4;
+  --app-blue: #95c2ff;
+  --app-blue-hover: #5aa0ff;
+  --app-green: #95ffd2;
+  --app-green-hover: #6effc1;
+  --app-red: #ff95c2;
+  --app-red-hover: #ff6eab;
+  --app-purple: #9d95ff;
+  --app-purple-hover: #796eff;
+  --app-orange: #ffd295;
+  --app-orange-hover: #ffc16e;
+  --app-yellow: #f7ff95;
+  --app-width: 400px;
 }
 
-.btn-center {
+*, input {
+  transition: width 0.25s;
+}
+
+body {
+  background: var(--app-red) url("../img/pastel-bg.jpg") center center / cover no-repeat fixed;
+}
+
+.center {
+  display: grid;
+  width: 100%;
+  height: calc(var(--vh, 1vh) * 100);
+  place-items: center;
+}
+
+.flex {
+  display: flex;
+  flex-flow: row wrap;
+}
+
+.word-display {
+  justify-content: center;
+  align-items: center;
+  width: var(--app-width);
+}
+
+.to-type {
+  color: var(--app-dark);
+  height: 50px;
+  margin-bottom: 20px;
+  width: calc(100% - 85px);
+  text-align: center;
+  font-size: 44px;
+}
+
+.arrow {
+  font-size: 34px;
+  position: relative;
+  bottom: 5px;
+}
+
+.spin {
+  animation: spin 200ms linear;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotateX(0deg);
+  }
+  50% {
+    transform: rotateX(180deg);
+  }
+  100% {
+    transform: rotateX(360deg);
+  }
+}
+
+.word {
+  margin: 0 10px;
+}
+
+.user-input {
+  margin-top: 20px;
+  height: 80px;
+  background-color: #060231;
+  width: var(--app-width);
+  border-radius: 60px;
+  text-align: center;
+  font-size: 30px;
+  color: var(--app-light);
+  padding: 0 40px;
+  border: 2px solid transparent;
+  transition: border 0.1s ease-in-out, width 0.25s;
+}
+
+.time-hit {
+  margin: 20px 0 10px;
+  width: var(--app-width);
+  text-align: center;
+}
+
+.btn {
+  width: var(--app-width);
+  text-align: center;
+}
+
+.play {
+  width: 160px;
+  height: 60px;
+  background-color: var(--app-purple);
+  border-radius: 70px;
+  color: var(--app-light);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+}
+
+.play:hover {
+  background-color: var(--app-purple-hover);
+}
+
+.instructions {
+  width: var(--app-width);
+  height: 25px;
+  text-align: center;
+  margin-top: 10px;
+}
+
+/* Stats */
+
+.stats-grid {
+  visibility: hidden;
+  opacity: 0;
+  display: grid;
+  width: 100%;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  place-items: center;
+  transition: 0.25s opacity;
+}
+.stats {
+  width: var(--app-width);
+  height: 400px;
+  background-image: url('../img/stats-bg.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  border-radius: 12px;
+  box-shadow: 3px 3px 7px -2px #03002299;
+  position: relative;
+  background: var(--app-red) url("../img/pastel-bg.jpg") center center / cover no-repeat fixed;
+}
+.darken {
+  border-radius: 12px;
+  padding: 20px 30px;
+  width: 100%;
+  height: 100%;
+  background-color: #f0f2f45a;
+}
+
+span {
+  color: var(--app-dark);
+}
+
+h3, h2 {
+  font-weight: 400;
+}
+
+h2 {
+  letter-spacing: 2px;
+  text-decoration: 2px overline var(--app-light);
+  font-size: 28px;
+  margin-bottom: 30px;
+}
+
+h3 {
+  letter-spacing: 0.3px;
+}
+
+h3, p {
+  width: 100%;
+  text-align: center;
+}
+
+h3 + p {
+  margin-bottom: 20px;
+}
+
+.exit {
   position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+  top: 20px;
+  right: 20px;
+  display: grid;
+  place-items: center;
+  color: var(--app-light);
+  background-color: var(--app-red-hover);
+  width: 20px;
+  height: 20px;
+  line-height: 0px;
+}
+
+.exit p {
+  position: relative;
+  bottom: 0.5px;
+}
+
+@media (max-width: 440px) {
+  :root {
+    --app-width: 300px;
+  }
+}
+
+@media (max-width: 350px) {
+  :root {
+    --app-width: 275px;
+  }
+  .to-type {
+    font-size: 32px;
+    height: 40px;
+    width: calc(100% - 68px);
+  }
+  .arrow {
+    font-size: 26px;
+  }
+}
+
+.date {
+  letter-spacing: 0.5px;
+}
+
+.leaderboard {
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+
+.leaderboard span + span {
+  margin-left: 20px;
+}
+
+.your-score {
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+
+.your-score p {
+  font-size: 20px;
+}
+
+.your-score h3 {
+  font-size: 28px;
+  margin-top: 20px;
+  margin-bottom: 16px;
 }

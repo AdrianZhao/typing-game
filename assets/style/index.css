@@ -16,7 +16,7 @@ body {
   display: grid;
   width: 100%;
   margin: auto;
-  margin-top: 300px;
+  margin-top: 200px;
   place-items: center;
 }
 .icon {
@@ -132,6 +132,13 @@ body {
   font-size: 20px;
   text-align: center;
   margin-top: 20px;
+}
+.score-board {
+  width: 350px;
+  font-size: 30px;
+  text-align: center;
+  margin-top: 20px;
+  font-weight: 600;
 }
 .correct {
   color: green;

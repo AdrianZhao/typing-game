@@ -7,6 +7,27 @@
 
 'use strict';
 
+class Score {
+  #date;
+  #hits;
+  constructor(date = new Date().toLocaleDateString(), hits=0) {
+    this.date = date;
+    this.hits = hits;
+  }
+  set date(date) {
+    this.#date = date;
+  }
+  set hits(hits) {
+    this.#hits = hits;
+  }
+  get date() {
+    return this.#date;
+  }
+  get hits() {
+    return this.#hits;
+  }
+}
+
 function onEvent(event, selector, callback) {
   return selector.addEventListener(event, callback);
 }
@@ -32,9 +53,10 @@ const btn = select('.btn');
 const play = select('.play');
 const input = select('.input');
 const icon = select('.icon');
-const words = ['dinosaur', 'love', 'pineapple', 'calendar', 'robot', 'building', 'population',
-'weather', 'bottle', 'history', 'dream', 'character', 'money', 'absolute',
-'discipline', 'machine', 'accurate', 'connection', 'rainbow', 'bicycle',
+const scoreDisplay = select('.score-board');
+const words = ['dinosaur', 'love', 'pineapple', 'calendar', 'robot', 'building', 
+'population', 'weather', 'bottle', 'history', 'dream', 'character', 'money',
+'absolute', 'discipline', 'machine', 'accurate', 'connection', 'rainbow', 'bicycle',
 'eclipse', 'calculator', 'trouble', 'watermelon', 'developer', 'philosophy',
 'database', 'periodic', 'capitalism', 'abominable', 'component', 'future',
 'pasta', 'microwave', 'jungle', 'wallet', 'canada', 'coffee', 'beauty', 'agency',
@@ -49,6 +71,10 @@ const words = ['dinosaur', 'love', 'pineapple', 'calendar', 'robot', 'building',
 
 const backgroundMusic = new Audio('./assets/audio/background.mp3');
 backgroundMusic.volume = 0.5;
+
+const score = new Score();
+const now = new Date();
+score.date = now.toDateString();
 
 let i = 0;
 let hits = 0;
@@ -91,6 +117,7 @@ function start() {
   }, 1000);
 }
 function endGame() {
+  getScore();
   play.innerText = 'PLAY AGAIN';
   seconds = 0;
   i = 0;
@@ -143,6 +170,7 @@ input.onkeyup = function() {
       hit.innerText = `${hits.toString().padStart(2, '0')}`;
       getRandomWord(words[i]);
       input.value = '';
+      score.hits = hits;
     } else {
       if (character != characterSpan.innerText) {
         characterSpan.classList.add('incorrect');
@@ -157,4 +185,7 @@ input.onkeyup = function() {
       }
     }
   })
+}
+function getScore() {
+  scoreDisplay.innerText = `Today is: ${score.date}\nYour score is: ${score.hits}`
 }

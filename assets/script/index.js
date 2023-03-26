@@ -10,7 +10,7 @@
 class Score {
   #date;
   #hits;
-  constructor(date = new Date().toLocaleDateString(), hits=0) {
+  constructor(date = new Date().toDateString(), hits) {
     this.date = date;
     this.hits = hits;
   }
@@ -73,8 +73,6 @@ const backgroundMusic = new Audio('./assets/audio/background.mp3');
 backgroundMusic.volume = 0.5;
 
 const score = new Score();
-const now = new Date();
-score.date = now.toDateString();
 
 let i = 0;
 let hits = 0;
@@ -133,6 +131,8 @@ onEvent('click', btn, function() {
   if (play.innerText === 'PLAY NOW' || play.innerText === 'PLAY AGAIN') {
     btn.disabled = true;
     play.innerText = 'READY';
+    scoreDisplay.innerText = '';
+    score.hits = 0;
     countDown(4);
   } else {
     endGame();

@@ -25,7 +25,11 @@ body {
   color: red;
   font-size: 50px;
   transition: all 0.5s ease-in-out; 
+}
+.move-icon{
   animation: move 0.5s ease-in-out;
+}
+.shake-icon{
   animation: shake 0.5s;
 }
 @keyframes move {

@@ -55,7 +55,6 @@ body {
   90% { transform: translate(1px, 2px) rotate(0deg); }
   100% { transform: translate(1px, -2px) rotate(-1deg); }
 }
-
 .word-display {
   justify-content: center;
   align-items: center;
@@ -70,7 +69,7 @@ body {
   font-size: 50px;
 }
 .input {
-  margin-top: 40px;
+  margin-top: 20px;
   height: 70px;
   background-color: lightgreen;
   width: 350px;
@@ -82,11 +81,12 @@ body {
 }
 .time-left {
   font-size: 20px;
-  margin: 20px 0 20px;
+  margin-top: 20px;
   width: 350px;
   text-align: center;
 }
 .btn {
+  margin-top: 25px;
   position: relative;
   left: calc(50% - 75px);
   display: inline-block;

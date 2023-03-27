@@ -10,9 +10,11 @@
 class Score {
   #date;
   #hits;
-  constructor(date = new Date().toDateString(), hits) {
-    this.date = date;
-    this.hits = hits;
+  #percentage;
+  constructor(date = new Date().toDateString(), hits, percentage) {
+    this.#date = date;
+    this.#hits = hits;
+    this.#percentage = percentage;
   }
   set date(date) {
     this.#date = date;
@@ -20,11 +22,17 @@ class Score {
   set hits(hits) {
     this.#hits = hits;
   }
+  set percentage(percentage) {
+    this.#percentage = percentage;
+  }
   get date() {
     return this.#date;
   }
   get hits() {
     return this.#hits;
+  }
+  get percentage() {
+    return this.#percentage;
   }
 }
 
@@ -171,6 +179,8 @@ input.onkeyup = function() {
       getRandomWord(words[i]);
       input.value = '';
       score.hits = hits;
+      const tempPercentage = (hits / 90) * 100;
+      score.percentage = tempPercentage.toFixed(2);
     } else {
       if (character != characterSpan.innerText) {
         characterSpan.classList.add('incorrect');
@@ -187,5 +197,7 @@ input.onkeyup = function() {
   })
 }
 function getScore() {
-  scoreDisplay.innerText = `Today is: ${score.date}\nYour score is: ${score.hits}`
+  scoreDisplay.innerText = `Today is: ${score.date}
+                            Your score is: ${score.hits} points
+                            You have finished ${score.percentage}% of totall 90 words`
 }

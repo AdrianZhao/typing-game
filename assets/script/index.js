@@ -115,6 +115,8 @@ function start() {
   setTimeout(() => {
     backgroundMusic.play();
     seconds = 99;
+    score.hits = 0;
+    score.percentage = 0;
     getRandomWord(words[i]);
     input.disabled = false;
     input.focus();

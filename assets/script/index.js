@@ -11,7 +11,7 @@ class Score {
   #date;
   #hits;
   #percentage;
-  constructor(date = new Date().toDateString(), hits, percentage) {
+  constructor(date = new Date().toDateString(), hits = 0, percentage = 0) {
     this.#date = date;
     this.#hits = hits;
     this.#percentage = percentage;

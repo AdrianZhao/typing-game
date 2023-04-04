@@ -8,31 +8,31 @@
 'use strict';
 
 class Score {
-  #date;
-  #hits;
-  #percentage;
+  _date;
+  _hits;
+  _percentage;
   constructor(date = new Date().toDateString(), hits = 0, percentage = 0) {
-    this.#date = date;
-    this.#hits = hits;
-    this.#percentage = percentage;
+    this._date = date;
+    this._hits = hits;
+    this._percentage = percentage;
   }
   set date(date) {
-    this.#date = date;
+    this._date = date;
   }
   set hits(hits) {
-    this.#hits = hits;
+    this._hits = hits;
   }
   set percentage(percentage) {
-    this.#percentage = percentage;
+    this._percentage = percentage;
   }
   get date() {
-    return this.#date;
+    return this._date;
   }
   get hits() {
-    return this.#hits;
+    return this._hits;
   }
   get percentage() {
-    return this.#percentage;
+    return this._percentage;
   }
 }
 
@@ -61,7 +61,10 @@ const btn = select('.btn');
 const play = select('.play');
 const input = select('.input');
 const icon = select('.icon');
-const scoreDisplay = select('.score-board');
+const getScore = select('.score')
+const leaderBoard = select('.leaderboard');
+const list = select('.list');
+const scores = localStorage.getItem("scores") ? JSON.parse(localStorage.getItem("scores")) : [];
 const words = ['dinosaur', 'love', 'pineapple', 'calendar', 'robot', 'building', 
 'population', 'weather', 'bottle', 'history', 'dream', 'character', 'money',
 'absolute', 'discipline', 'machine', 'accurate', 'connection', 'rainbow', 'bicycle',
@@ -80,11 +83,11 @@ const words = ['dinosaur', 'love', 'pineapple', 'calendar', 'robot', 'building',
 const backgroundMusic = new Audio('./assets/audio/background.mp3');
 backgroundMusic.volume = 0.5;
 
-const score = new Score();
+let score = new Score();
 
 let i = 0;
 let hits = 0;
-let seconds = 100;
+let seconds = 99;
 input.value = '';
 input.disabled = true;
 
@@ -103,7 +106,7 @@ function displayTime() {
   if(seconds >= 0) {
     setTimeout(function() {
       displayTime()
-    }, 1000);
+    }, 1000); 
   }
   if(seconds < 0) {
     endGame();
@@ -125,7 +128,7 @@ function start() {
   }, 1000);
 }
 function endGame() {
-  getScore();
+  getThisScore();
   play.innerText = 'PLAY AGAIN';
   seconds = 0;
   i = 0;
@@ -141,8 +144,6 @@ onEvent('click', btn, function() {
   if (play.innerText === 'PLAY NOW' || play.innerText === 'PLAY AGAIN') {
     btn.disabled = true;
     play.innerText = 'READY';
-    scoreDisplay.innerText = '';
-    score.hits = 0;
     countDown(4);
   } else {
     endGame();
@@ -162,7 +163,6 @@ function countDown(timeleft) {
   });
 }
 input.onkeyup = function() {
-  console.log(input.value);
   const wordSpan = inputWord.querySelectorAll('span');
   const inputValue = input.value.toLowerCase().trim().split('');
   const tempInputValue = '';
@@ -180,9 +180,6 @@ input.onkeyup = function() {
       hit.innerText = `${hits.toString().padStart(2, '0')}`;
       getRandomWord(words[i]);
       input.value = '';
-      score.hits = hits;
-      const tempPercentage = (hits / 90) * 100;
-      score.percentage = tempPercentage.toFixed(2);
     } else {
       if (character != characterSpan.innerText) {
         characterSpan.classList.add('incorrect');
@@ -198,8 +195,31 @@ input.onkeyup = function() {
     }
   })
 }
-function getScore() {
-  scoreDisplay.innerText = `Today is: ${score.date}
-                            Your score is: ${score.hits} points
-                            You have finished ${score.percentage}% of totall 90 words`
+function getList(place, hits, date, percent) {
+  let row = create('div');
+  row.innerHTML =
+  `<div># ${place}</div>
+  <div>Hits: ${hits}</div>
+  <div>${date}</div>
+  <div>${percent}%</div>`;
+  list.append(row);
 }
+function getThisScore() {
+  score = {};
+  score.date = new Date().toDateString();
+  score.hits = hits;
+  const tempPercentage = (hits / 90) * 100;
+  score.percentage = tempPercentage.toFixed(2);
+  scores.push(score);
+  scores.sort((a, b) => (a.hits > b.hits) ? -1 : 1);
+  for (let i = 0; i < scores.length; i++) {
+    getList(i + 1, scores[i].hits, scores[i].date, scores[i].percentage);
+  }
+  localStorage.setItem('scores', JSON.stringify(scores));
+  leaderBoard.showModal();
+}
+onEvent('click', leaderBoard, function(e){
+  const rect = this.getBoundingClientRect();
+  if (e.clientY < rect.top || e.clientY > rect.bottom || e.clientX < rect.left || e.clientX > rect.right)
+    leaderBoard.close();
+})

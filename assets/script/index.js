@@ -60,6 +60,7 @@ const hit = select('.hit')
 const btn = select('.btn');
 const play = select('.play');
 const input = select('.input');
+const instruction = select('.information');
 const icon = select('.icon');
 const getScore = select('.score')
 const leaderBoard = select('.leaderboard');
@@ -103,16 +104,17 @@ function getRandomWord(letter) {
 function displayTime() {
   time.innerText = `${seconds.toString().padStart(2, 0)}s`;
   seconds--;
-  if(seconds >= 0) {
+  if(seconds > 0) {
     setTimeout(function() {
       displayTime()
     }, 1000); 
   }
-  if(seconds < 0) {
+  if(seconds <= 0 && play.innerText === 'END GAME') {
     endGame();
   }
 }
 function start() {
+  list.innerHTML = '';
   btn.disabled = false;
   words.sort(() => (Math.random() > 0.5) ? 1 : -1);
   setTimeout(() => {
@@ -137,8 +139,9 @@ function endGame() {
   input.disabled = true;
   inputWord.innerHTML = '';
   input.value = '';
-  backgroundMusic.pause()
+  backgroundMusic.pause();
   backgroundMusic.currentTime = 0;
+  score = {};
 }
 onEvent('click', btn, function() {
   if (play.innerText === 'PLAY NOW' || play.innerText === 'PLAY AGAIN') {
@@ -150,6 +153,7 @@ onEvent('click', btn, function() {
   }
 })
 function countDown(timeleft) {
+  instruction.style.opacity = '0';
   return new Promise((resolve, reject) => {
     let countdownTimer = setInterval(() => {
       timeleft--;
@@ -204,14 +208,17 @@ function getList(place, hits, date, percent) {
   <div>${percent}%</div>`;
   list.append(row);
 }
+function sortNum(a, b) {
+  return a - b;
+}
 function getThisScore() {
-  score = {};
   score.date = new Date().toDateString();
   score.hits = hits;
   const tempPercentage = (hits / 90) * 100;
   score.percentage = tempPercentage.toFixed(2);
   scores.push(score);
-  scores.sort((a, b) => (a.hits > b.hits) ? -1 : 1);
+  scores.sort((a, b) => (b.hits - a.hits));
+  console.log(scores);
   for (let i = 0; i < scores.length; i++) {
     getList(i + 1, scores[i].hits, scores[i].date, scores[i].percentage);
   }
